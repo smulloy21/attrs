@@ -14,7 +14,10 @@ Changes:
 Backward-incompatible changes:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-*none*
+- ``attrs`` will set the ``__hash__`` method to ``None`` by default now.
+  The way hashes were handled before was in conflict with `Python's specification <https://docs.python.org/3/reference/datamodel.html#object.__hash__>`_.
+  This *may* break some software although this breakage is most likely just surfacing of latent bugs.
+  You can always make ``attrs`` create the ``__hash__`` method using ``@attr.s(hash=True)``.
 
 
 Deprecations:
@@ -26,6 +29,8 @@ Deprecations:
 Changes:
 ^^^^^^^^
 
+- Fix hashing behavior by setting ``__hash__`` to ``None`` by default.
+  `#136 <https://github.com/hynek/attrs/issues/136>`_
 - Add ``attr.evolve`` that, given an instance of an ``attrs`` class and field changes as keyword arguments, will instantiate a copy of the given instance with the changes applied.
   ``evolve`` replaces ``assoc``, which is now deprecated.
   ``evolve`` is significantly faster than ``assoc``, and requires the class have an initializer that can take the field values as keyword arguments (like ``attrs`` itself can generate).

@@ -232,7 +232,8 @@ class TestAddHash(object):
         """
         If `hash` is False, ignore that attribute.
         """
-        C = make_class("C", {"a": attr(hash=False), "b": attr()}, slots=slots)
+        C = make_class("C", {"a": attr(hash=False), "b": attr()},
+                       slots=slots, hash=True)
 
         assert hash(C(1, 2)) == hash(C(2, 2))
 
@@ -242,6 +243,20 @@ class TestAddHash(object):
         __hash__ returns different hashes for different values.
         """
         assert hash(cls(1, 2)) != hash(cls(1, 1))
+
+    def test_hash_default(self):
+        """
+        Classes are not hashable by default.
+        """
+        C = make_class("C", {})
+
+        with pytest.raises(TypeError) as e:
+            hash(C())
+
+        assert e.value.args[0] in (
+            "'C' objects are unhashable",  # PyPy
+            "unhashable type: 'C'",  # CPython
+        )
 
 
 class TestAddInit(object):

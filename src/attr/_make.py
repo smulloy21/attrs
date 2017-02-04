@@ -215,7 +215,7 @@ def _frozen_delattrs(self, name):
 
 
 def attributes(maybe_cls=None, these=None, repr_ns=None,
-               repr=True, cmp=True, hash=True, init=True,
+               repr=True, cmp=True, hash=None, init=True,
                slots=False, frozen=False, str=False):
     r"""
     A class decorator that adds `dunder
@@ -244,8 +244,24 @@ def attributes(maybe_cls=None, these=None, repr_ns=None,
         ``__gt__``, and ``__ge__`` methods that compare the class as if it were
         a tuple of its ``attrs`` attributes.  But the attributes are *only*
         compared, if the type of both classes is *identical*!
-    :param bool hash: Create a ``__hash__`` method that returns the
-        :func:`hash` of a tuple of all ``attrs`` attribute values.
+    :param hash: If ``True``, create a ``__hash__`` method that returns the
+        :func:`hash` of a tuple of all ``attrs`` attribute values.  Please note
+        that this makes only sense if and only if the class and *all of it's
+        attributes* are never mutated!
+
+        If set to ``False``, ``attrs`` won't create a ``__hash__`` method for
+        you.  Use this if you want to use the ``__hash__`` method of the
+        superclass (including ``object``).
+
+        The default of this argument is ``None`` which sets the ``__hash__``
+        method to ``None`` and marks it unhashable which is true for most
+        classes in practice.
+
+        See the `Python documentation \
+        <https://docs.python.org/3/reference/datamodel.html#object.__hash__>`_
+        and the `GitHub issue that led to the default behavior \
+        <https://github.com/hynek/attrs/issues/136>`_ for more details.
+    :type hash: ``bool`` or ``None``
     :param bool init: Create a ``__init__`` method that initialiazes the
         ``attrs`` attributes.  Leading underscores are stripped for the
         argument name.  If a ``__attrs_post_init__`` method exists on the
@@ -272,6 +288,9 @@ def attributes(maybe_cls=None, these=None, repr_ns=None,
     ..  versionadded:: 16.0.0 *slots*
     ..  versionadded:: 16.1.0 *frozen*
     ..  versionadded:: 16.3.0 *str*, and support for ``__attrs_post_init__``.
+    ..  versionchanged::
+            17.1.0 *hash* supports ``None`` as value which is also the default
+            now.
     """
     def wrap(cls):
         if getattr(cls, "__class__", None) is None:
@@ -300,6 +319,8 @@ def attributes(maybe_cls=None, these=None, repr_ns=None,
             cls = _add_cmp(cls)
         if hash is True:
             cls = _add_hash(cls)
+        elif hash is None:
+            cls.__hash__ = None
         if init is True:
             cls = _add_init(cls, frozen)
         if frozen is True:
