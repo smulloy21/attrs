@@ -88,9 +88,9 @@ class TestDarkMagic(object):
         """
         assert (
             Attribute(name="x", default=foo, _validator=None,
-                      repr=True, cmp=True, hash=True, init=True),
+                      repr=True, cmp=True, hash=None, init=True),
             Attribute(name="y", default=attr.Factory(list), _validator=None,
-                      repr=True, cmp=True, hash=True, init=True),
+                      repr=True, cmp=True, hash=None, init=True),
         ) == attr.fields(cls)
 
     @pytest.mark.parametrize("cls", [C1, C1Slots])
@@ -137,9 +137,9 @@ class TestDarkMagic(object):
         PC = attr.make_class("PC", ["a", "b"], slots=slots, frozen=frozen)
         assert (
             Attribute(name="a", default=NOTHING, _validator=None,
-                      repr=True, cmp=True, hash=True, init=True),
+                      repr=True, cmp=True, hash=None, init=True),
             Attribute(name="b", default=NOTHING, _validator=None,
-                      repr=True, cmp=True, hash=True, init=True),
+                      repr=True, cmp=True, hash=None, init=True),
         ) == attr.fields(PC)
 
     @pytest.mark.parametrize("cls", [Sub, SubSlots])
