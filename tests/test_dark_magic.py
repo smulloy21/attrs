@@ -1,7 +1,9 @@
 from __future__ import absolute_import, division, print_function
+
 import pickle
 
 import pytest
+
 from hypothesis import given
 from hypothesis.strategies import booleans
 
